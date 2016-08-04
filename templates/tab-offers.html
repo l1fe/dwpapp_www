@@ -1,0 +1,29 @@
+<ion-view view-title="Акции">
+  <ion-content ng-controller="NewsCtrl">
+    <script src="https://api.vk.com/method/wall.get?owner_id=-25908118&v=5.53&callback=newsCallback"></script>
+
+    <div class="list card" ng-repeat="newsEntry in newsList">
+
+      <div class="item item-avatar">
+        <img src="img/dwp.jpg">
+        <h2>Don't worry papa</h2>
+        <p>{{newsEntry.date}}</p>
+      </div>
+
+      <div class="item item-body">
+        <img class="full-image" src="{{newsEntry.attachments[0].photo.photo_604}}">
+        <p>
+          {{newsEntry.text}}
+        </p>
+        <p>
+          <a href="#" class="subdued">{{newsEntry.likes.count || 0}} Нравится</a>
+          <a href="#" class="subdued">{{newsEntry.comment.count || 0}} Комментариев</a>
+        </p>
+      </div>
+
+    </div>
+
+
+  </ion-content>
+
+</ion-view>

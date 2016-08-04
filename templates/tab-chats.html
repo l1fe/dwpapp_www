@@ -1,0 +1,11 @@
+<ion-view view-title="Бронирование">
+  <ion-content>
+    <ion-list>
+      <ion-item class="item-remove-animate item-icon-right" ng-repeat="chat in chats" type="item-text-wrap" href="#/tab/chats/{{chat.id}}">
+        <h2>{{chat.Descr}}</h2>
+        <p>Вместимость: {{chat.Capacity}}</p>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>
