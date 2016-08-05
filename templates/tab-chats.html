@@ -1,11 +1,14 @@
 <ion-view view-title="Бронирование">
-  <ion-content>
-    <ion-list>
-      <ion-item class="item-remove-animate item-icon-right" ng-repeat="chat in chats" type="item-text-wrap" href="#/tab/chats/{{chat.id}}">
-        <h2>{{chat.Descr}}</h2>
-        <p>Вместимость: {{chat.Capacity}}</p>
-        <i class="icon ion-chevron-right icon-accessory"></i>
-      </ion-item>
-    </ion-list>
-  </ion-content>
+    <ion-content>
+        <button class="button button-full button-positive" ng-click="prevMenu()" ng-show="showPrevButton">
+            Назад
+        </button>
+        <ion-list>
+            <ion-item class="item-remove-animate item-icon-right" ng-repeat="table in tables" type="item-text-wrap" ng-click="nextMenu(table)">
+                <h2>{{table.Descr}}</h2>
+                <p><h3>{{showCapacity(table)}}</h3></p>
+                <i class="icon ion-chevron-right icon-accessory" ng-show="table.IsFolder"></i>
+            </ion-item>
+        </ion-list>
+    </ion-content>
 </ion-view>

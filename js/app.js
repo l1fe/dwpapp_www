@@ -78,16 +78,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
                 views: {
                     'tab-menu': {
                         templateUrl: 'templates/menu-detail.html',
-                        controller: 'MenuDetailCtrl'
-                    }
-                }
-            })
-            .state('tab.subMenu-detail', {
-                url: '/subMenu/:subMenuId',
-                views: {
-                    'tab-menu': {
-                        templateUrl: 'templates/subMenu-detail.html',
-                        controller: 'SubMenuDetailCtrl'
+                        controller: 'SubMenuCtrl'
                     }
                 }
             })
