@@ -1,47 +1,50 @@
 angular.module('starter.services', [])
     .factory('db', databoomSrv('https://t334.databoom.space', 'b334'))
+
     .service('DataboomService', function(db) {
         var loginDb = 't334';
         var passwordDb = 'avssn123';
 
-        function load(collection) {
-            return db.login(loginDb, passwordDb).then(function() {
-                return db.load(collection);
-            }, function() {
-                console.log('The DataboomService login error!');
-            });
-        }
-
-        function loadWithQueryOptions(collection, filter) {
-            return db.login(loginDb, passwordDb).then(function() {
-                return db.load(collection, filter);
-            }, function() {
-                console.log('The DataboomService login error!');
-            });
-        }
-
         return {
-            load: load,
-            loadWithQueryOptions: loadWithQueryOptions
+            load: function(collection) {
+                return db.login(loginDb, passwordDb).then(function() {
+                    return db.load(collection);
+                }, function() {
+                    console.log('The DataboomService login error!');
+                });
+            },
+            loadWithQueryOptions: function(collection, filter) {
+                return db.login(loginDb, passwordDb).then(function() {
+                    return db.load(collection, filter);
+                }, function() {
+                    console.log('The DataboomService login error!');
+                });
+            },
+            save: function(label, obj) {
+                return db.login(loginDb, passwordDb).then(function() {
+                    return db.save(label, obj);
+                }, function() {
+                    console.log('The DataboomService error!');
+                });
+            }
         }
     })
+
     .factory('TableMenuHolder', function(DataboomService) {
         var tables;
-
-        function update() {
-            return DataboomService.load("Table").then(function(data) {
-                tables = data;
-                return data;
-            });
-        }
-
         return {
             getTables: function() {
                 return tables;
             },
-            update: update
+            update: function() {
+                return DataboomService.load("Table").then(function(data) {
+                    tables = data;
+                    return data;
+                });
+            }
         }
     })
+
     .factory('FoodMenuHolder', function(DataboomService) {
         var menu;
         var menuType;
@@ -66,61 +69,62 @@ angular.module('starter.services', [])
             }
         }
     })
-    .factory('OrderHolder', function() {
+    .factory('OrderHolder', function(DataboomService) {
         var orderIsOpen;
-
-        var order = {
-            id: "",
-            StartTime: 0,
-            EndTime: 0,
-            Client: "",
-            Table: "",
-            Menu: [],
-            collections: [
-                {
-                    id: "Reserved"
-                }
-            ]
-        };
-
-        var menu = [];
-
+        var order;
+        var initOrder = function() {
+            order = {
+                id: "",
+                StartTime: 0,
+                EndTime: 0,
+                Client: "",
+                Table: "",
+                Menu: []
+            }
+        }
+        initOrder();
         return {
             setOrderStatus: function(status) {
                 orderIsOpen = status;
             },
-            getOrderStatus: function () {
+            getOrderStatus: function() {
                 return orderIsOpen;
             },
-            initOrder: function() {
-                order = {
-                    id: "",
-                    StartTime: 0,
-                    EndTime: 0,
-                    Client: "",
-                    Table: "",
-                    Menu: [],
-                    collections: [
-                        {
-                            id: "Reserved"
-                        }
-                    ]
-                }
-            },
+            initOrder: initOrder,
             setClient: function(client) {
                 order.Client = client;
             },
             setTable: function(table) {
                 order.Table = table;
             },
-            addToMenu: function (obj) {
-                menu[menu.length] = obj;
+            addToMenu: function(obj) {
+                if (order.Menu.some(function(item) {
+                    return item.Numenclature === obj.id;
+                })) {
+                    order.Menu.forEach(function(item) {
+                        if (item.Numenclature === obj.id) {
+                            item.Quantity++;
+                            item.Sum += item.Sum;
+                        }
+                    });
+                } else {
+                    var food = {
+                        Numenclature: obj.id,
+                        Quantity: 1,
+                        Price: obj.Price,
+                        Sum: obj.Price
+                    }
+                    order.Menu[order.Menu.length] = food;
+                    console.log(food);
+                }
             },
             getMenu: function() {
-                return menu;
+                return order.Menu;
             },
             sentOrder: function() {
-                
+                DataboomService.save("Reserved", order);
+                initOrder();
+                orderIsOpen = false;
             }
-    }
+        }
     })

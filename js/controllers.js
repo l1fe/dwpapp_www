@@ -2,12 +2,19 @@
     .controller('DashCtrl', function(FoodMenuHolder) {
         FoodMenuHolder.update();
     })
-    .controller('ChatsCtrl', function($scope, TableMenuHolder,  $ionicPopup, OrderHolder, $state) {
+
+    .controller('ChatsCtrl', function($scope, TableMenuHolder, $ionicPopup, OrderHolder, $state) {
         var nullLink = "00000000-0000-0000-0000-000000000000";
         var tables;
+        TableMenuHolder.update().then(function(data) {
+            tables = data;
+            $scope.tables = tables.filter(function(item) {
+                return (item.Parent === nullLink) && (!item.Busy);
+            });
+        });
 
         function nextMenu(element) {
-            var menu = tables.filter(function (item) {
+            var menu = tables.filter(function(item) {
                 return (item.Parent === element.id) && (!item.Busy);
             });
             $scope.parent = element;
@@ -19,20 +26,17 @@
             OrderHolder.initOrder();
             var title = "Подтвердите заказ";
             var template = "Вы действительно хотите забронировать этот столик?";
-            var goFoodMenu = function () {
-                $state.go("tab.menu");
-            }
 
             function showConfirm() {
                 var confirmPopup = $ionicPopup.confirm({
                     title: title,
                     template: template
                 });
-                confirmPopup.then(function (res) {
+                confirmPopup.then(function(res) {
                     if (res) {
                         OrderHolder.setTable(element.id);
                         OrderHolder.setOrderStatus(true);
-                        goFoodMenu();
+                        $state.go("tab.menu");
                     } else {
                         console.log("User taped cancel in tables order.");
                     }
@@ -41,14 +45,6 @@
 
             showConfirm();
         }
-
-        TableMenuHolder.update().then(function(data) {
-            tables = data;
-            $scope.tables = tables.filter(function(item) {
-                return (item.Parent === nullLink) && (!item.Busy);
-            });
-        });
-
 
         $scope.textCapacity = function(table) {
             return table.Capacity !== 0 ? "Вместимость: " + table.Capacity : null;
@@ -62,18 +58,18 @@
             }
         }
 
-        $scope.prevMenu = function () {
+        $scope.prevMenu = function() {
             var prevMenu;
             if ($scope.parent.Parent === nullLink) {
-                prevMenu = tables.filter(function (item) {
+                prevMenu = tables.filter(function(item) {
                     return (item.Parent === nullLink) && (!item.Busy);
                 });
                 $scope.parent = null;
             } else {
-                prevMenu = tables.filter(function (item) {
+                prevMenu = tables.filter(function(item) {
                     return (item.Parent === $scope.parent.Parent) && (!item.Busy);
                 });
-                var parentMenu = tables.filter(function (item) {
+                var parentMenu = tables.filter(function(item) {
                     return item.id === prevMenu[0].Parent;
                 });
                 $scope.parent = parentMenu[0];
@@ -83,65 +79,65 @@
         }
     })
 
-    .controller('MenuCtrl', function ($scope, FoodMenuHolder, OrderHolder, $ionicPopup) {
+    .controller('MenuCtrl', function($scope, FoodMenuHolder, OrderHolder, $ionicPopup, $state) {
         $scope.showOrderButton = OrderHolder.getOrderStatus();
-
-        $scope.orderReady = function () {
-            OrderHolder.setOrderStatus(false);
-            $scope.showOrderButton = OrderHolder.getOrderStatus();
+        $scope.menuTypes = FoodMenuHolder.getMenuType();
+        $scope.orderReady = function() {
             var title = "Заказ:";
             var template = "";
             var menu = OrderHolder.getMenu();
             for (var i = 0; i < menu.length; i++) {
-                template += menu[i].Descr + " ";
+                template += menu[i].Numenclature + "[" + menu[i].Quantity + "]\n";
             }
+
             function showInfo() {
                 var popup = $ionicPopup.alert({
                     title: title,
                     template: template
                 });
-                popup.then(function (res) {
+                popup.then(function(res) {
                     console.log('Thank you for not eating my delicious ice cream cone');
                 });
             }
+            OrderHolder.sentOrder();
             showInfo();
+            $state.go("tab.dash");
         }
-        $scope.menuTypes = FoodMenuHolder.getMenuType();
-        
     })
 
-    .controller('SubMenuCtrl', function ($scope, FoodMenuHolder, $stateParams, OrderHolder, $ionicPopup) {
+    .controller('SubMenuCtrl', function($scope, FoodMenuHolder, $stateParams, OrderHolder, $ionicPopup, $state) {
         var nullLink = "00000000-0000-0000-0000-000000000000";
 
         $scope.showOrderButton = OrderHolder.getOrderStatus();
-
-        $scope.orderReady = function () {
-            OrderHolder.setOrderStatus(false);
-            $scope.showOrderButton = OrderHolder.getOrderStatus();
-            var title = "Заказ:";
-            var template = "";
-            var menu = OrderHolder.getMenu();
-            for (var i = 0; i < menu.length; i++) {
-                template += menu[i].Descr + " ";
-            }
-            function showInfo() {
-                var popup = $ionicPopup.alert({
-                    title: title,
-                    template: template
-                });
-                popup.then(function (res) {
-                    console.log('Thank you for not eating my delicious ice cream cone');
-                });
-            }
-
-            showInfo();
-        }
-
+        $scope.showBackButton = false;
         $scope.menu = FoodMenuHolder.getMenu().filter(function(item) {
             return (item.Parent === nullLink) && (item.Owner === $stateParams.menuTypeId);
         });
 
-        $scope.tapElement = function (element) {
+        $scope.orderReady = function() {
+            var title = "Заказ:";
+            var template = "";
+            var menu = OrderHolder.getMenu();
+            for (var i = 0; i < menu.length; i++) {
+                template += menu[i].Numenclature + "[" + menu[i].Quantity + "]\n";
+            }
+
+            function showInfo() {
+                var popup = $ionicPopup.alert({
+                    title: title,
+                    template: template
+                });
+                popup.then(function(res) {
+                    console.log('Thank you for not eating my delicious ice cream cone');
+                });
+            }
+
+            OrderHolder.sentOrder();
+            showInfo();
+            $state.go("tab.dash");
+        }
+
+        $scope.tapElement = function(element) {
             var title = "Подтвердите выбор";
             var template = "Добавить это к заказу?";
 
@@ -150,7 +146,7 @@
                     title: title,
                     template: template
                 });
-                confirmPopup.then(function (res) {
+                confirmPopup.then(function(res) {
                     if (res) {
                         OrderHolder.addToMenu(element);
                     } else {
@@ -174,14 +170,14 @@
         }
 
         $scope.textPrice = function(element) {
-            return element.Price !== 0 ? "Цена: "+element.Price : null;
+            return element.Price !== 0 ? "Цена: " + element.Price : null;
         }
 
         $scope.prevMenu = function() {
             var prevMenu;
-            if ($scope.parent.Parent === "00000000-0000-0000-0000-000000000000") {
+            if ($scope.parent.Parent === nullLink) {
                 prevMenu = FoodMenuHolder.getMenu().filter(function(item) {
-                    return (item.Parent === "00000000-0000-0000-0000-000000000000") && (item.Owner === $stateParams.menuTypeId);
+                    return (item.Parent === nullLink) && (item.Owner === $stateParams.menuTypeId);
                 });
                 $scope.parent = null;
             } else {
@@ -192,12 +188,12 @@
                     return item.id === prevMenu[0].Parent;
                 });
                 $scope.parent = parentMenu[0];
-            }           
+            }
             $scope.menu = prevMenu;
             $scope.showBackButton = $scope.parent !== null;
         }
 
-        $scope.showBackButton = false;
+
     })
 
     .controller('AccountCtrl', function($scope) {
