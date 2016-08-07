@@ -1,12 +1,12 @@
 <ion-view view-title="Бронирование">
     <ion-content>
-        <button class="button button-full button-positive" ng-click="prevMenu()" ng-show="showPrevButton">
+        <button class="button button-stable" ng-click="prevMenu()" ng-show="showBackButton">
             Назад
         </button>
         <ion-list>
-            <ion-item class="item-remove-animate item-icon-right" ng-repeat="table in tables" type="item-text-wrap" ng-click="nextMenu(table)">
+            <ion-item class="item-remove-animate item-icon-right" ng-repeat="table in tables" type="item-text-wrap" ng-click="clickElement(table)">
                 <h2>{{table.Descr}}</h2>
-                <p><h3>{{showCapacity(table)}}</h3></p>
+                <h3>{{textCapacity(table)}}</h3>
                 <i class="icon ion-chevron-right icon-accessory" ng-show="table.IsFolder"></i>
             </ion-item>
         </ion-list>

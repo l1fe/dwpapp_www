@@ -1,10 +1,13 @@
 <ion-view view-title="Меню">
-  <ion-content>
-      <ion-list>
-          <ion-item class="item-remove-animate item-icon-right" ng-repeat="menuType in menuTypes" type="item-text-wrap" href="#/tab/menu/{{menuType.id}}">
-              <h2>{{menuType.Descr}}</h2>
-              <i class="icon ion-chevron-right icon-accessory"></i>
-          </ion-item>
-      </ion-list>
-  </ion-content>
+    <ion-content>
+        <button class="button bar-header button-stable" ng-click="orderReady()" ng-show="showOrderButton">
+            Заказ готов!
+        </button>
+        <ion-list>
+            <ion-item class="item-remove-animate item-icon-right" ng-repeat="menuType in menuTypes" type="item-text-wrap" href="#/tab/menu/{{menuType.id}}">
+                <h2>{{menuType.Descr}}</h2>
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+        </ion-list>
+    </ion-content>
 </ion-view>

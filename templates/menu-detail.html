@@ -1,13 +1,15 @@
 ﻿<ion-view view-title="Меню">
-    <ion-content class="padding">
-        <button class="button button-full button-positive" ng-click="prevMenu()" ng-show="showPrevButton">
+    <ion-content>
+        <button class="button bar-header button-stable" ng-click="prevMenu()" ng-show="showBackButton">
             Назад
         </button>
+        <button class="button bar-header button-stable" ng-click="orderReady()" ng-show="showOrderButton">
+            Заказ готов!
+        </button>
         <ion-list>
-            <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="element in menu" type="item-text-wrap" ng-click="nextMenu(element)">
-                <img src="img/food-icons/salad.png">
+            <ion-item class="item-remove-animate item-icon-right" ng-repeat="element in menu" type="item-text-wrap" ng-click="tapElement(element)">
                 <h2>{{element.Descr}}</h2>
-                <h3>{{showPrice(element)}}</h3>
+                <h3>{{textPrice(element)}}</h3>
                 <i class="icon ion-chevron-right icon-accessory" ng-show="element.IsFolder"></i>
             </ion-item>
         </ion-list>
